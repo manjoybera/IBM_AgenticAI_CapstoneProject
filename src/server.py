@@ -3,25 +3,34 @@ from fastmcp import FastMCP
 from pathlib import Path
 import json
 
+
+
 # Initializing our MCP server instance
 mcp = FastMCP("Connoisseur-Server")
 
-# Data paths
+
+
+# Data Paths
 DATA_DIR = Path(__file__).parent
 CULINARY_MAP_PATH = DATA_DIR / "California-Culinary-Map.txt"
 RESTAURANT_DATA_PATH = DATA_DIR / "structured-restaurant-data.json"
 REVIEW_DATA_PATH = DATA_DIR / "augmented-user-review.json"
 
-# Helper functions
+
+
+# Helper Functions
 def load_restaurant_data() -> list[dict]:
     """Load the structured restaurant data produced in Module 1."""
     with open(RESTAURANT_DATA_PATH, "r") as f:
         return json.load(f)
 
+
 def load_review_data() -> list[dict]:
     """Load the augmented user reviews produced in Module 1."""
     with open(REVIEW_DATA_PATH, "r") as f:
         return json.load(f)
+
+
 
 # MCP Resource - Exposing the Raw Culinary Map data
 @mcp.resource("culinary-map://california")
@@ -30,6 +39,8 @@ def get_culinary_map() -> str:
     Contains detailed descriptions of 100+ restaurants across California
     including their vibes, cuisines, ratings, and price ranges."""
     return CULINARY_MAP_PATH.read_text()
+
+
 
 # TOOL 1 — Get Restaurant Info (Structured Search)
 @mcp.tool()
@@ -62,12 +73,14 @@ def get_restaurant_info(restaurant_name: str) -> str:
         indent=2,
     )
 
+
+
 # TOOL 2 — Recommend by Vibe (Semantic Search)
 @mcp.tool()
 def recommend_by_vibe(vibe: str) -> str:
     """Find restaurants that match a given vibe or atmosphere keyword.
     Searches both structured vibe tags and raw text descriptions.
-    Examples of vibe keywords: "moody", "sun-drenched", "romantic"""
+    Examples of vibe keywords: "moody", "sun-drenched", "romantic", etc."""
     restaurants = load_restaurant_data()
     vibe_lower = vibe.lower().strip()
 
@@ -106,6 +119,8 @@ def recommend_by_vibe(vibe: str) -> str:
         indent=2,
     )
 
+
+
 # TOOL 3 — Get Review (Returns Review Data for Lab 2 Demonstration)
 @mcp.tool()
 def get_review(restaurant_name: str) -> str:
@@ -124,8 +139,8 @@ def get_review(restaurant_name: str) -> str:
     if not matching_review:
         return json.dumps(
             {
-                "status": "not_found" , #TODO
-                "message": f"No review found matching '{restaurant_name}'." , #TODO
+                "status": "not_found",
+                "message": f"No review found for '{restaurant_name}'.",
             },
             indent=2,
         )
@@ -143,7 +158,8 @@ def get_review(restaurant_name: str) -> str:
         indent=2,
     )
 
+
+
 # Run the Server
 if __name__ == "__main__":
     mcp.run()
-
